@@ -23,7 +23,7 @@ RUN apt-get update && \
 
 # Create the start script to run Gotty with a bash shell
 RUN echo '#!/bin/bash' > /run_gotty.sh && \
-    echo '/usr/local/bin/gotty --permit-write --reconnect --browser http://0.0.0.0:8080 /bin/bash' >> /run_gotty.sh && \
+    echo '/usr/local/bin/gotty --permit-write --reconnect /bin/bash' >> /run_gotty.sh && \
     chmod +x /run_gotty.sh
 
 # Expose the port to access the Gotty terminal
