@@ -25,6 +25,9 @@ RUN useradd -m coder && \
     mkdir -p /home/coder/.docker && \
     chown -R coder:coder /home/coder
 
+# Set environment variables (optional)
+ENV NODE_ENV=production
+
 # Switch to non-root user
 USER coder
 WORKDIR /home/coder
@@ -32,11 +35,14 @@ WORKDIR /home/coder
 # Expose Docker socket to interact with Docker from within the container (optional)
 VOLUME /var/run/docker.sock
 
-# Set environment variables (optional)
-ENV NODE_ENV=production
+# Create start.sh script to initialize container
+RUN echo '#!/bin/bash' > /start.sh && \
+    echo 'echo "Starting container..."' >> /start.sh && \
+    echo 'exec /bin/bash' >> /start.sh && \
+    chmod +x /start.sh
 
-# Expose default ports for Node.js or any other service you might use
+# Expose port for the application or console
 EXPOSE 8080
 
-# Start a simple shell console (bash or zsh, for example)
-CMD ["/bin/bash"]
+# Run start script
+CMD ["/start.sh"]
