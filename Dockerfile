@@ -35,14 +35,14 @@ WORKDIR /home/coder
 # Expose Docker socket to interact with Docker from within the container (optional)
 VOLUME /var/run/docker.sock
 
-# Create start.sh script to initialize container
-RUN echo '#!/bin/bash' > /start.sh && \
-    echo 'echo "Starting container..."' >> /start.sh && \
-    echo 'exec /bin/bash' >> /start.sh && \
-    chmod +x /start.sh
+# Create start.sh script in /home/coder to initialize container
+RUN echo '#!/bin/bash' > /home/coder/start.sh && \
+    echo 'echo "Starting container..."' >> /home/coder/start.sh && \
+    echo 'exec /bin/bash' >> /home/coder/start.sh && \
+    chmod +x /home/coder/start.sh
 
 # Expose port for the application or console
 EXPOSE 8080
 
 # Run start script
-CMD ["/start.sh"]
+CMD ["/home/coder/start.sh"]
