@@ -9,16 +9,13 @@ RUN apt-get update && \
 
 # Install Node.js (latest LTS)
 RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - && \
-    apt-get install -y nodejs
+    apt-get install -y nodejs && \
+    apt-get clean
 
-# Install Docker
+# Install Docker (if needed inside the container)
 RUN curl -fsSL https://get.docker.com | bash && \
     apt-get install -y docker-ce docker-ce-cli containerd.io && \
     apt-get clean
-
-# Install Docker Compose (Optional, if you plan to use Compose)
-RUN curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose && \
-    chmod +x /usr/local/bin/docker-compose
 
 # Create a new non-root user
 RUN useradd -m coder && \
@@ -35,14 +32,21 @@ WORKDIR /home/coder
 # Expose Docker socket to interact with Docker from within the container (optional)
 VOLUME /var/run/docker.sock
 
+# Install npm dependencies (if you're using a Node.js app)
+COPY package*.json /home/coder/
+RUN npm install
+
+# Copy the rest of the application files (if you have a Node.js app)
+COPY . /home/coder/
+
+# Expose the port that the service will run on
+EXPOSE 8080
+
 # Create start.sh script in /home/coder to initialize container
 RUN echo '#!/bin/bash' > /home/coder/start.sh && \
     echo 'echo "Starting container..."' >> /home/coder/start.sh && \
-    echo 'exec /bin/bash' >> /home/coder/start.sh && \
+    echo 'npm start' >> /home/coder/start.sh && \
     chmod +x /home/coder/start.sh
-
-# Expose port for the application or console
-EXPOSE 8080
 
 # Run start script
 CMD ["/home/coder/start.sh"]
