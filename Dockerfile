@@ -1,27 +1,34 @@
-FROM ubuntu:14.04
-LABEL maintainer="wingnut0310 <wingnut0310@gmail.com>"
+# Use an Ubuntu image as the base
+FROM ubuntu:22.04
 
+# Set environment variables
 ENV LANG en_US.UTF-8
 ENV LANGUAGE en_US:en
 ENV GOTTY_TAG_VER v1.0.1
 
-# Install necessary packages
-RUN apt-get -y update && \
-    apt-get install -y curl && \
+# Install dependencies: curl, Docker, and Gotty
+RUN apt-get update && \
+    apt-get install -y \
+    curl \
+    sudo \
+    docker.io \
+    tar \
+    wget \
+    bash \
+    && \
     curl -sLk https://github.com/yudai/gotty/releases/download/${GOTTY_TAG_VER}/gotty_linux_amd64.tar.gz \
     | tar xzC /usr/local/bin && \
-    apt-get purge --auto-remove -y curl && \
     apt-get clean && \
-    rm -rf /var/lib/apt/lists*
+    rm -rf /var/lib/apt/lists/*
 
-# Add run_gotty.sh script (which will launch the bash console)
-COPY /run_gotty.sh /run_gotty.sh
+# Create a script to start Gotty with the bash shell
+COPY run_gotty.sh /run_gotty.sh
 
 # Make the script executable
 RUN chmod +x /run_gotty.sh
 
-# Expose port 8080 for Gotty
+# Expose the port for Gotty (web console)
 EXPOSE 8080
 
-# Start Gotty with bash as the command
+# Start Gotty with root access
 CMD ["/bin/bash", "/run_gotty.sh"]
