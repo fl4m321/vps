@@ -1,12 +1,12 @@
-# Use an Ubuntu image as the base
+# Use an official Ubuntu as the base image
 FROM ubuntu:22.04
 
-# Set environment variables
+# Set environment variables for the terminal and Gotty
 ENV LANG en_US.UTF-8
 ENV LANGUAGE en_US:en
 ENV GOTTY_TAG_VER v1.0.1
 
-# Install dependencies: curl, Docker, and Gotty
+# Install dependencies: curl, Docker, Gotty, and utilities
 RUN apt-get update && \
     apt-get install -y \
     curl \
@@ -21,14 +21,13 @@ RUN apt-get update && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-# Create a script to start Gotty with the bash shell
-COPY run_gotty.sh /run_gotty.sh
+# Create the start script to run Gotty with a bash shell
+RUN echo '#!/bin/bash' > /run_gotty.sh && \
+    echo '/usr/local/bin/gotty --permit-write --reconnect /bin/bash' >> /run_gotty.sh && \
+    chmod +x /run_gotty.sh
 
-# Make the script executable
-RUN chmod +x /run_gotty.sh
-
-# Expose the port for Gotty (web console)
+# Expose the port to access the Gotty terminal
 EXPOSE 8080
 
-# Start Gotty with root access
+# Set the command to start the Gotty web terminal on startup
 CMD ["/bin/bash", "/run_gotty.sh"]
